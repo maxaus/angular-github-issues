@@ -1,0 +1,35 @@
+extends ../main
+
+block append content-body
+    form(name="issueSearchForm", ng-submit="searchIssues()", novalidate).form-inline
+        .form-group
+            input(type="text", name="owner", ng-model="owner", placeholder=":owner", ng-required).form-control
+        .form-group
+            input(type="text", name="repo", ng-model="repo", placeholder=":repository", ng-required).form-control
+        .form-group
+            button(type="submit", ng-disabled="searchInProgress || !owner || !repo").btn.btn-success Search
+    h4(ng-show="!issueList && !noResults && !searchInProgress") Please, select owner and repo
+    div(ng-show="searchInProgress").loading
+    div(ng-show="noResults").alert.alert-info
+        | No issues found. Please, try with another user and repo name.
+    .total Total: {{totalCount}}
+    div(ng-hide="!issueList").panel.panel-default
+        .panel-heading
+            | Items per page: &nbsp;
+            select(ng-model="pageSize", ng-change="searchIssues()").form-control
+              option(ng-repeat="option in pageSizeOptions", ng-selected="option == pageSize", value="{{option}}") {{option}}
+        .panel-body
+            .row
+                ul(ng-hide="!issueList").issue-list
+                    li(ng-repeat="issue in issueList track by $index")
+                        issue-list-item
+            .row
+                ul(ng-hide="pageCount < 2").pagination.pagination-sm
+                    li(class="{{currentPage == 1 ? 'disabled' : ''}}")
+                        a(href="", ng-click="loadPrevPage()") &laquo;
+                    li(ng-repeat="n in range(pageCount) track by $index", class="{{currentPage == ($index + 1) ? 'active' : ''}}")
+                        a(href="", ng-click="loadPage($index + 1)") {{$index + 1}}
+                    //li
+                    //  span.gap ...
+                    li(class="{{nextPageDisabled ? 'disabled' : ''}}")
+                        a(href="", ng-click="loadNextPage()") &raquo;

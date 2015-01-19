@@ -1,0 +1,38 @@
+extends ../main
+block append content-body
+    div(ng-show="!issue && searchInProgress").loading
+    div(ng-show="notFound").alert.alert-warning
+        | Issue not found. Please, check your URL params.
+    div(ng-hide="!issue").panel.panel-default
+        .panel-heading
+            | # {{issue.number}}: {{issue.title}}
+        .panel-body
+            .row
+                .col-sm-4
+                    .thumbnail-container
+                        img(ng-src="{{issue.user.avatar_url}}").avatar
+                        br
+                        a(href="http://github.com/{{issue.user.login}}", target="_blank", title="Go to GitHub profile") {{issue.user.login}}
+                .col-sm-8
+                    .info-container
+                        .row
+                            span.info-label Assignee:
+                            span(ng-if="issue.assignee").info-value 
+                                a(href="http://github.com/{{issue.assignee.login}}", target="_blank") {{issue.assignee.login}}
+                            span(ng-if="!issue.assignee").info-value --
+                        .row
+                            span.info-label Labels:
+                            span(ng-if="issue.labels && issue.labels.length > 0").info-value
+                              a(ng-repeat="n in range(issue.labels.length) track by $index", href="{{issue.labels[$index].url}}", target="_blank")
+                                span(style="background-color: #{{issue.labels[$index].color}}").badge {{issue.labels[$index].name}}
+                            span(ng-if="!issue.labels ||issue.labels.length == 0").info-value --
+                        .row
+                            span.info-label Created at:
+                            span.info-value {{issue.created_at | date:'dd.MM.yyyy HH:mm'}}
+                        .row
+                            span.info-label Updated at:
+                            span.info-value {{issue.updated_at | date:'dd.MM.yyyy HH:mm'}}   
+                        .row 
+                          a(href="{{owner && repo ? '#/' + owner + '/' + repo : '/'}}").btn.btn-success
+                            span.glyphicon.glyphicon-list
+                            | &nbsp; Back to Issue List
